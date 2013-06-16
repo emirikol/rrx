@@ -79,6 +79,10 @@ module Reactive::Observable
       Push.new(o1: self, o2: observable)
     end
 
+    def skip(count)
+      Skip.new(target: self, count: count)
+    end
+
   end
 
 end

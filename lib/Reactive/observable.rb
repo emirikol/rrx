@@ -10,6 +10,7 @@ module Observable
   autoload :Grep, 'reactive/observable/grep'
   autoload :First, 'reactive/observable/first'
   autoload :Push, 'reactive/observable/push'
+  autoload :Skip, 'reactive/observable/skip'
   autoload :Base, 'reactive/observable/base'
 
 
@@ -40,6 +41,16 @@ module Observable
         lambda {|x| x },
         lambda {|x| duration }
     )
+  end
+
+  def self.from_array(array)
+    FromProc.new do |observer|
+      array.each { |v|
+        observer.on_next(v)
+      }
+      observer.on_complete
+      Disposable::Wrapper.new
+    end
   end
 
 

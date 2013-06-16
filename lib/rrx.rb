@@ -48,6 +48,12 @@ module Reactive
       end
 
     end
+
+    class Closure
+      def initialize(&cleanup)
+        ObjectSpace.define_finalizer(self, cleanup)
+      end
+    end
   end
 
 
