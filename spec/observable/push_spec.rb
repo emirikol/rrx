@@ -5,11 +5,10 @@ describe Reactive::Observable do
 
   context 'timer(2000).push(timer(5000))' do
     before do
-      pending
       o1 = Reactive::Observable.timer(2000)
       o2 = Reactive::Observable.timer(5000)
       @s = o1.push(o2)
-      subscribe(@s)
+      @s.subscribe(observer)
     end
 
     it 'does not fire before first timer' do
@@ -27,14 +26,18 @@ describe Reactive::Observable do
       advance_by(4001)
     end
 
-    it 'fires twice once both timers have run' do
-      observer[:on_next].should_receive(:call).exactly(:twice).with(0)
-      advance_by(7001)
+    context 'once both timers have run' do
+      advance_by(7001).and do |expectation|
+        expectation.next_should { be_called.exactly(:twice).with(0) }
+        expectation.complete_should { be_called }
+      end
     end
 
-    it 'doesn\'t fire any more after both timers have run' do
-      observer[:on_next].should_receive(:call).exactly(:twice).with(0)
-      advance_by(20001)
+    context 'doesn\'t fire any more after both timers have run' do
+      advance_by(20001).and do |expectation|
+        expectation.next_should { be_called.exactly(2).times.with(0) }
+        expectation.complete_should { be_called }
+      end
     end
 
   end

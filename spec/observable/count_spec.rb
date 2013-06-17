@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe Reactive::Observable::Count do
+describe Reactive::Observable do
 
   include Lets
 
@@ -10,19 +10,16 @@ describe Reactive::Observable::Count do
       @s.subscribe(observer)
     end
 
-    it 'fires with 1 after one interval' do
-      observer[:on_next].should_receive(:call).with(1)
-      advance_by(1001)
+    advance_by(1001) do
+      should send_call.with(1).on(observer, :on_next)
     end
 
-    it 'fires with 2 after two intervals' do
-      observer[:on_next].should_receive(:call).with(2)
-      advance_by 2001
+    advance_by(2001) do
+      should send_call.with(2).on(observer, :on_next)
     end
 
-    it 'fires with 7 after 7 intervals' do
-      observer[:on_next].should_receive(:call).with(7)
-      advance_by 7001
+    advance_by 7001 do
+      should send_call.with(7).on(observer, :on_next)
     end
 
   end

@@ -74,6 +74,11 @@ class SendMessage
      self
   end
 
+  def ordered
+    @ordered = true
+    self
+  end
+
   def times
     self
   end
@@ -82,10 +87,12 @@ class SendMessage
     @target = object[attr]
     @name = attr
     m = @target.should_receive(@method)
-    m = m.exactly(@exactly).times if @exactly
+    m.exactly(@exactly).times if @exactly
     m.with(@with) if @with
+    m.ordered if @ordered
     self
   end
+  alias on to
 
   def matches?(that)
     true
@@ -100,65 +107,82 @@ end
 def send_call()
   SendMessage.new(:call)
 end
+alias be_called send_call
 
+class MockObserver
+  attr_reader :expectations
 
-#def error
-#  @error ||= []
-#end
+  def initialize(rspec, ms)
+    @context = rspec
+    @ms = ms
+    @expectations =  {}
+  end
+
+  def and
+    yield self
+    observer_expectation = self
+    ms = @ms
+    expectations.each do |name, block|
+      @context.it {
+        observer_expectation.modify(observer, name)
+        instance_eval &block
+      }
+    end
+    @context.after {
+      scheduler.advance_by(ms)
+    }
+  end
+
+  def complete(&block)
+    @expectations[:on_complete] = block
+    self
+  end
+  def complete_should(&matcher)
+    #complete { should matcher.with(no_args).on(observer, :on_complete) }
+    complete { should instance_eval(&matcher).with(no_args).on(observer, :on_complete) }
+  end
+  def error(&block)
+    @expectations[:on_error] = block
+    self
+  end
+  def error_should(&matcher)
+    complete { should instance_eval(&matcher).on(observer, :on_error) }
+  end
+  def next(&block)
+    @expectations[:on_next] = block
+    self
+  end
+  def next_should(&matcher)
+    self.next { should instance_eval(&matcher).on(observer, :on_next) }
+  end
+
+  def modify(observer, for_event)
+    [:on_complete, :on_error, :on_next].each do |event|
+      next if for_event == event
+      observer[event] = ->(*a) {} if @expectations[event]
+    end
+    observer[for_event]
+  end
+end
+def advance_by_and(ms)
+
+end
+
 
 def restart
   scheduler.restart
 end
 
-def advance_and_check_event_counts(events)
-  events.each {|event| advance_and_check_event_count(*event) }
-end
 
-def advance_and_check_event_count(advance_by = nil, e_nxt = 0, e_complete = 0, e_error = 0, opts= {})
-  [[:next_size, e_nxt], [:complete_size, e_complete], [:error_size, e_error]].each do |base, chg|
-    it do
-      expect {
-        instance_eval(&opts[:proc]) if opts[:proc]
-        scheduler.advance_by(advance_by)
-      }.to change(self, base).by(chg)
+def advance_by(ms, &block)
+  if self.respond_to?(:it)
+    if block
+      MockObserver.new(self, ms).and do |exp|
+        exp.next &block
+      end
+    else
+      MockObserver.new(self, ms)
     end
-  end
-  #[nxt.size, error.size, complete.size].should == [e_nxt, e_error, e_complete]
-end
-
-def next_size
-  nxt.size
-end
-def error_size
-  error.size
-end
-def complete_size
-  complete.size
-end
-
-
-
-def subscribe(observable)
-  observable.subscribe(
-      :on_next => ->(v) { nxt << v;  },
-      :on_complete => ->() { complete << 1  },
-      :on_error => ->(e) { error << e  }
-  )
-end
-
-
-def advance_by(ms, options = {}, &block)
-  if block
-    case options[:ignore]
-      when :on_next, :on_error
-        before { observer[options[:ignore]] = ->(v) {} }
-      when :on_complete
-        before { observer[:on_complete] = ->() {} }
-    end
-    after {
-      scheduler.advance_by(ms)
-    }
-    it &block
   else
     scheduler.advance_by(ms)
   end
@@ -167,7 +191,6 @@ end
 module Lets
   def self.included(context)
     context.let(:scheduler) { VirtualScheduler.new }
-    #context.let(:observer) { {on_next: "Double (next)", on_error:  double('error'), on_complete:  double('complete') } }
     context.let(:observer) { {on_next: double('next'), on_error:  double('error'), on_complete:  double('complete') } }
 
     context.before do

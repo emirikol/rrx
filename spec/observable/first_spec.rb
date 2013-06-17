@@ -15,26 +15,26 @@ describe Reactive::Observable::First do
       }
     end
 
-    context 'after 3 intervals' do
-      advance_by(3001, ignore: :on_complete) {
-        should send_call.exactly(3).times.with(kind_of(Fixnum)).to(observer, :on_next)
-      }
-      advance_by(3001, ignore: :on_next) {
-        should send_call.with(no_args).to(observer, :on_complete)
-      }
+    context 'after 3 intervals', focus: true do
+
+      advance_by(3001).and do |expectation|
+        expectation.complete_should { be_called }
+        expectation.next_should { be_called.exactly(3).times.with(kind_of(Fixnum))  }
+      end
     end
 
 
     context 'after 4 intervals' do
-      advance_by(4001, ignore: :on_complete) {
-        should send_call.exactly(3).times.with(kind_of(Fixnum)).to(observer, :on_next)
-      }
+      advance_by(3001).and do |expectation|
+        expectation.complete_should { be_called.with(kind_of(Fixnum)) }
+        expectation.next_should  { be_called.exactly(3).times.with(kind_of(Fixnum)) }
+      end
     end
 
   end
 
   context  do
-    it 'take 1 from 1', :focus => true do
+    it 'take 1 from 1' do
       @s = Reactive::Observable::First.new(target:  Reactive::Observable.once(1), count: 1 )
       observer[:on_next].should_receive(:call).with(1)
       observer[:on_complete].should_receive(:call).with(no_args())

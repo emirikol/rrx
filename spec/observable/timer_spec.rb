@@ -19,21 +19,17 @@ describe Reactive::Observable do
     end
 
     context 'timer has passed' do
-      advance_by(2001, ignore: :on_complete) {
-        should send_call.with(0).to(observer, :on_next)
-      }
-      advance_by(2001, ignore: :on_next) {
-        should send_call.to(observer, :on_complete)
-      }
+      advance_by(2001).and do |its|
+        its.next_should { be_called.with(0) }
+        its.complete_should { be_called }
+      end
     end
 
     context "timer x2 has passed" do
-      advance_by(4001, ignore: :on_complete) {
-        should send_call.with(0).to(observer, :on_next)
-      }
-      advance_by(4001, ignore: :on_next) {
-        should send_call.to(observer, :on_complete)
-      }
+      advance_by(4001).and do |its|
+        its.next_should { be_called.with(0) }
+        its.complete_should { be_called }
+      end
     end
 
   end
