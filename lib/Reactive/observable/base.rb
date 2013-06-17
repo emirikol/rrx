@@ -63,6 +63,10 @@ module Reactive::Observable
 
     #joining
 
+    def count
+      Count.new(target: self)
+    end
+
     def merge(observable)
       #MultiMerge.new(observables)
       #observable = observables[0]

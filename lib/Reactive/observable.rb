@@ -12,6 +12,7 @@ module Observable
   autoload :Push, 'reactive/observable/push'
   autoload :Skip, 'reactive/observable/skip'
   autoload :Unshift, 'reactive/observable/unshift'
+  autoload :Count, 'reactive/observable/count'
   autoload :Base, 'reactive/observable/base'
 
 

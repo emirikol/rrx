@@ -10,16 +10,18 @@ describe Reactive::Observable do
       @s.subscribe(observer)
     end
 
-    advance_by(1001) do
-      should send_call.with(1).on(observer, :on_next)
+    context 'first interval' do
+      advance_by(1000) do
+        should send_call.with(1).on(observer, :on_next)
+      end
     end
 
-    advance_by(2001) do
-      should send_call.with(2).on(observer, :on_next)
-    end
-
-    advance_by 7001 do
-      should send_call.with(7).on(observer, :on_next)
+    context 'seven intervals' do
+      advance_by(7000) do
+        1.upto(7).each do |i|
+          should send_call.with(i).on(observer, :on_next).ordered
+        end
+      end
     end
 
   end
