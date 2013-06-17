@@ -11,7 +11,7 @@ module Reactive::Observable
         on_error(e)
       else
         #new_values.each {|v| @target.on_next(v)  }
-        @target.on_next(new_value)
+        @observer.on_next(new_value)
       end
     end
 

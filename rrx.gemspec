@@ -10,7 +10,7 @@ Gem::Specification.new do |gem|
   gem.email         = ["shoefish@gmail.com"]
   gem.description   = %q{Reactive Extensions provide an enumerable-like interface to process temporal data(events) with the eash usually reserved for structural Enumerables }
   gem.summary       = %q{Ruby Reactive Extensions}
-  gem.homepage      = ""
+  gem.homepage      = "https://github.com/emirikol/rrx"
 
   gem.files         = `git ls-files`.split($/)
   gem.executables   = gem.files.grep(%r{^bin/}).map{ |f| File.basename(f) }

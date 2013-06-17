@@ -17,6 +17,12 @@ module Reactive::Observable
       end
       const_set(:Observer, observer)
     end
+    def self.observer_on_complete(&method)
+      observer = Class.new(Reactive::ObserverWrapper) do
+        define_method(:on_complete, &method)
+      end
+      const_set(:Observer, observer)
+    end
 
     delegate :schedule_periodic, :schedule_once, :now, to: :scheduler
 
@@ -76,11 +82,20 @@ module Reactive::Observable
     end
 
     def push(observable)
-      Push.new(o1: self, o2: observable)
+      Push.new(target: self, o2: observable)
     end
 
     def skip(count)
       Skip.new(target: self, count: count)
+    end
+
+    def unshift(*values)
+      if values.size == 1 && values[0].kind_of?(Base)
+        observable = values[0]
+      else
+        observable = Reactive::Observable.from_array(values)
+      end
+      Unshift.new(target: self, unshifted: observable)
     end
 
   end

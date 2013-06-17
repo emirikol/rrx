@@ -11,6 +11,7 @@ module Observable
   autoload :First, 'reactive/observable/first'
   autoload :Push, 'reactive/observable/push'
   autoload :Skip, 'reactive/observable/skip'
+  autoload :Unshift, 'reactive/observable/unshift'
   autoload :Base, 'reactive/observable/base'
 
 
@@ -36,8 +37,18 @@ module Observable
   def self.interval(duration)
     Generate.new(
         0,
-        lambda {|x| 1 },
+        lambda {|x| true },
         lambda {|x| 1 + x },
+        lambda {|x| x },
+        lambda {|x| duration }
+    )
+  end
+
+  def self.timer(duration)
+    Generate.new(
+        0,
+        lambda {|x| false },
+        lambda {|x| x },
         lambda {|x| x },
         lambda {|x| duration }
     )

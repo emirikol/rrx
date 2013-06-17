@@ -1,10 +1,10 @@
 module Reactive
   module Observable
     class Generate < Base
-      attr_reader :init_value, :continue_perdicate, :step_action, :result_projection, :inter_step_duration
+      attr_reader :init_value, :continue_predicate, :step_action, :result_projection, :inter_step_duration
 
-      def initialize(init_value, continue_perdicate, step_action, result_projection, inter_step_duration)
-        @init_value, @continue_perdicate, @step_action, @result_projection, @inter_step_duration = init_value, continue_perdicate, step_action, result_projection, inter_step_duration
+      def initialize(init_value, continue_predicate, step_action, result_projection, inter_step_duration)
+        @init_value, @continue_predicate, @step_action, @result_projection, @inter_step_duration = init_value, continue_predicate, step_action, result_projection, inter_step_duration
       end
 
       def run(observer)
@@ -13,7 +13,7 @@ module Reactive
         duration = @inter_step_duration
         action = @step_action
         projection = @result_projection
-        continue = @continue_perdicate
+        continue = @continue_predicate
 
         init_duration = duration.call(state)
         self.schedule_periodic(init_duration, lambda do

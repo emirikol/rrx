@@ -14,7 +14,7 @@ module Reactive::Observable
       #can be less change attribute nilling on unwrap to opt in/out or write unwrap method?
       #or leave as is because everything is sort of perfect?
       def on_next(value)
-        @target.on_next(value)
+        @observer.on_next(value)
         @taken += 1
         on_complete if @taken == @count
       end

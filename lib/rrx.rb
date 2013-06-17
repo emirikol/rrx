@@ -58,13 +58,13 @@ module Reactive
 
 
   class ObserverWrapper
-    attr_reader :target, :parent
+    attr_reader :observer, :parent
 
-    def initialize(target, parent, opts = {})
+    def initialize(observer, parent, opts = {})
       attributes.each do |name, default|
         instance_variable_set(:"@#{name}", opts[name])
       end
-      @target =  target
+      @observer =  observer
       @parent =  AmbivalentRef.new(parent)
     end
 
@@ -73,11 +73,11 @@ module Reactive
     end
 
     def on_next(value)
-      @target.on_next(value)
+      @observer.on_next(value)
     end
 
     def on_complete
-      @target.on_complete
+      @observer.on_complete
       unwrap
     end
 
@@ -87,7 +87,7 @@ module Reactive
 
     def unwrap
       attributes.each {|name, default|  instance_variable_set(:"@#{name}", nil)  }
-      @target = EmptyObserver.new
+      @observer = EmptyObserver.new
       unwrap_parent if active?
     end
 

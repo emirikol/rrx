@@ -1,43 +1,25 @@
 module Reactive::Observable
 
-  class Push < Composite
-    add_attributes :o1, :o2
-
-    #def initialize(o1, o2)
-    #  @o1, @o2 = o1, o2
-    #end
+  class Push < Wrapper
+    add_attributes :o2
 
     def initial_subscriptions
-      [@o1]
+      [@target]
     end
 
-    def observer_args(observer, parent)
-        [observer, parent, @o2]
-    end
 
     class Observer < Reactive::ObserverWrapper
-      attr_reader :next_observable
-
-      def initialize(observer, parent, ob)
-        @next_observable = ob
-        super(observer, parent)
-      end
 
       def on_complete
-        if @next_observable
-          next_observable = @next_observable
-          @next_observable = nil
+        if @o2
+          next_observable = @o2
+          @o2 = nil
           disposable = next_observable.subscribe_observer(self)
-          wrap_with_parent(disposable) if @target
+          wrap_with_parent(disposable) if @observer
         else
-          @target.on_complete
+          @observer.on_complete
           unwrap
         end
-      end
-
-      def unwrap
-        @next_observable = nil
-        super
       end
 
     end

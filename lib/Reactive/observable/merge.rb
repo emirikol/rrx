@@ -14,7 +14,7 @@ module Reactive
         if num_completed == 0
           self.num_completed = 1
         else
-          self.target.on_complete
+          @observer.on_complete
           unwrap
         end
       end
