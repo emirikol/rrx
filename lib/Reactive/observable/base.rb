@@ -67,6 +67,10 @@ module Reactive::Observable
       Count.new(target: self)
     end
 
+    def each_slice(count, options = {})
+      EachSlice.new(target: self, count: count, skip: options[:skip] || 0)
+    end
+
     def merge(observable)
       #MultiMerge.new(observables)
       #observable = observables[0]

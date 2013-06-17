@@ -13,6 +13,7 @@ module Observable
   autoload :Skip, 'reactive/observable/skip'
   autoload :Unshift, 'reactive/observable/unshift'
   autoload :Count, 'reactive/observable/count'
+  autoload :EachSlice, 'reactive/observable/each_slice'
   autoload :Base, 'reactive/observable/base'
 
 
