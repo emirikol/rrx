@@ -10,7 +10,9 @@ TODO:
 * make them pass
 * documentation
 * syntax sugar
-* go over Array and Enumerable to see what additional methods should have a reactive counterpart 
+* go over Array and Enumerable to see what additional methods should have a reactive counterpart
+* 100+ bloody Rx observable functions one can implement
+* proper scheduler support, allow to use Rufus, EM or virtual
 * prepare some kickass samples
 
 ## Installation

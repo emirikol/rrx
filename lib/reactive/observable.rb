@@ -14,6 +14,7 @@ module Observable
   autoload :Unshift, 'reactive/observable/unshift'
   autoload :Count, 'reactive/observable/count'
   autoload :EachSlice, 'reactive/observable/each_slice'
+  autoload :MergeNotifications, 'reactive/observable/merge_notifications'
   autoload :Base, 'reactive/observable/base'
 
 
@@ -31,6 +32,13 @@ module Observable
     FromProc.new do |observer|
       from.upto(from + size) {|i| observer.on_next(i) }
       observer.on_complete
+      Disposable::Wrapper.new
+    end
+  end
+
+  def self.error(exception)
+    FromProc.new do |observer|
+      observer.on_error(exception)
       Disposable::Wrapper.new
     end
   end
@@ -64,6 +72,10 @@ module Observable
       observer.on_complete
       Disposable::Wrapper.new
     end
+  end
+
+  def self.merge(*array)
+    self.from_array(array).merge
   end
 
 

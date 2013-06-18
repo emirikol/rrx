@@ -71,10 +71,12 @@ module Reactive::Observable
       EachSlice.new(target: self, count: count, skip: options[:skip] || 0)
     end
 
-    def merge(observable)
+    def merge(observable = nil)
       #MultiMerge.new(observables)
       #observable = observables[0]
-      observable ? Merge.new(o1: self, o2: observable) : MergeNotifications(self)
+      observable ?
+          Merge.new(o1: self, o2: observable) :
+          MergeNotifications.new(target: self)
     end
 
     def map(&proc)

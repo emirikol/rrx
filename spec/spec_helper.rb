@@ -112,7 +112,8 @@ alias be_called send_call
 class MockObserver
   attr_reader :expectations
 
-  def initialize(rspec, ms)
+  def initialize(rspec, ms, description = nil )
+    @description = description || "after #{ms} ms"
     @context = rspec
     @ms = ms
     @expectations =  {}
@@ -122,15 +123,17 @@ class MockObserver
     yield self
     observer_expectation = self
     ms = @ms
-    expectations.each do |name, block|
-      @context.it {
-        observer_expectation.modify(observer, name)
-        instance_eval &block
+    @context.context @description do
+      observer_expectation.expectations.each do |name, block|
+        it {
+          observer_expectation.modify(observer, name)
+          instance_eval &block
+        }
+      end
+      after {
+        scheduler.advance_by(ms)
       }
     end
-    @context.after {
-      scheduler.advance_by(ms)
-    }
   end
 
   def complete(&block)
@@ -146,7 +149,7 @@ class MockObserver
     self
   end
   def error_should(&matcher)
-    complete { should instance_eval(&matcher).on(observer, :on_error) }
+    error { should instance_eval(&matcher).on(observer, :on_error) }
   end
   def next(&block)
     @expectations[:on_next] = block
@@ -174,14 +177,14 @@ def restart
 end
 
 
-def advance_by(ms, &block)
+def advance_by(ms, description = nil, &block)
   if self.respond_to?(:it)
     if block
-      MockObserver.new(self, ms).and do |exp|
+      MockObserver.new(self, ms, description).and do |exp|
         exp.next &block
       end
     else
-      MockObserver.new(self, ms)
+      MockObserver.new(self, ms, description)
     end
   else
     scheduler.advance_by(ms)

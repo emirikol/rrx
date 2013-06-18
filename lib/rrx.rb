@@ -49,6 +49,35 @@ module Reactive
 
     end
 
+    class Composite
+
+      def initialize
+        @children = Set.new
+      end
+
+      def target
+        @children
+      end
+
+      def target=(val)
+        @children << val
+      end
+
+      def clear
+        @children.clear
+      end
+
+      def remove(child)
+        @children.delete(child)
+      end
+
+      def unwrap(child = nil)
+        return remove(child) if child;
+        clear
+      end
+
+    end
+
     class Closure
       def initialize(&cleanup)
         ObjectSpace.define_finalizer(self, cleanup)
@@ -81,6 +110,11 @@ module Reactive
       unwrap
     end
 
+    def on_error(error)
+      @observer.on_error(error)
+      unwrap
+    end
+
     def wrap_with_parent(child)
       @parent.target = child
     end
@@ -89,6 +123,11 @@ module Reactive
       attributes.each {|name, default|  instance_variable_set(:"@#{name}", nil)  }
       @observer = EmptyObserver.new
       unwrap_parent if active?
+    end
+
+    def is_disposing?
+      #!defined?(@parent)
+      @parent.nil?
     end
 
     def active?
