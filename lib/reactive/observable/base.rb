@@ -79,6 +79,10 @@ module Reactive::Observable
           MergeNotifications.new(target: self)
     end
 
+    def combine_latest(observable)
+      CombineLatest.new(o1: self, o2: observable)
+    end
+
     def map(&proc)
       Map.new(target: self, mapper: proc)
     end

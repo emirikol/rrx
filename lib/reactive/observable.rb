@@ -15,6 +15,7 @@ module Observable
   autoload :Count, 'reactive/observable/count'
   autoload :EachSlice, 'reactive/observable/each_slice'
   autoload :MergeNotifications, 'reactive/observable/merge_notifications'
+  autoload :CombineLatest, 'reactive/observable/combine_latest'
   autoload :Base, 'reactive/observable/base'
 
 
