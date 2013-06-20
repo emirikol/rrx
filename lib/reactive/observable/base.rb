@@ -61,6 +61,13 @@ module Reactive::Observable
       arg ? {scheduler => arg} : {}
     end
 
+    def each
+      subscribe(
+          :on_next => ->(value) {  yield value },
+          :on_error => ->(error) {  raise error }
+      )
+    end
+
     #joining
 
     def count
